@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Client Camera Web App</title>
+
+    <style>
+        #video {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg); /* Safari and Chrome */
+            -moz-transform: rotateY(180deg); /* Firefox */
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div id="container">
+        <video autoplay playsinline id="videoElement"></video>
+        <canvas id="canvas" width="400" height="300"></canvas>
+    </div>
+
+    <div class='video'>
+        <img id="photo" width="400" height="300" alt="Processed">
+    </div>
+
+    <div id="counters">
+        <p>Left Counter: <span id="left_counter">0</span></p>
+        <p>Right Counter: <span id="right_counter">0</span></p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/5.10.0/socket.io.js"></script>
+    <script>
+        var socket = io.connect("http://127.0.0.1:5000");
+    
+
+        // Handle Socket.IO connection event
+        socket.on('connect', function () {
+            console.log('Connected!', socket.connected);
+        });
+
+        const video = document.querySelector('#videoElement');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        video.width = 400;
+        video.height = 300;
+
+        if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices
+                .getUserMedia({ video: true })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function (error) {
+                    console.error('Error accessing camera:', error);
+                });
+        }
+
+        const FPS = 10;
+        setInterval(() => {
+            width = video.width;
+            height = video.height;
+            context.drawImage(video, 0, 0, width, height);
+            var data = canvas.toDataURL('image/jpeg', 0.5);
+            context.clearRect(0, 0, width, height);
+            socket.emit('image', data);
+        }, 1000 / FPS);
+
+        setInterval(() => {
+            width = video.width;
+            height = video.height;
+            context.drawImage(video, 0, 0, width, height);
+            var data = canvas.toDataURL('image/jpeg', 0.5);
+            context.clearRect(0, 0, width, height);
+            socket.emit('img', data);
+        }, 1000 / FPS);
+
+        socket.on('pose_data', function (data) {
+            console.log('Received pose data:', data);
+
+            // Update the UI with the curl counters
+            document.getElementById('left_counter').innerText = data.left_counter;
+            document.getElementById('right_counter').innerText = data.right_counter;
+
+            // Update the 'photo' element with the processed image
+            var photo = document.getElementById('photo');
+            photo.setAttribute('src', data.frame);
+        });
+
+
+        // Handle WebSocket errors
+        socket.on('error', function (error) {
+            console.error('WebSocket error:', error);
+        });
+    </script>
+</body>
+</html>
