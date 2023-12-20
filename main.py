@@ -56,9 +56,9 @@ def test_connect():
 #     emit("processed_image", processed_img_data)
 
 
-@app.route("/")
-def index():
-    return render_template("main.html")
+# @app.route("/")
+# def index():
+#     return render_template("main.html")
 
 
 mp_drawing = mp.solutions.drawing_utils
@@ -184,4 +184,4 @@ if __name__ == "__main__":
     host = '127.0.0.1'
 
     # Set debug to True for development and allow_unsafe_werkzeug to suppress the runtime error
-    socketio.run(app, debug=True, port=port, host=host, allow_unsafe_werkzeug=True,log_output=True)
+    socketio.run(app, debug=False, port=port, host=host, allow_unsafe_werkzeug=True,log_output=True)
