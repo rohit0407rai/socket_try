@@ -178,7 +178,7 @@ def trigger_generate_frames():
 
 if __name__ == "__main__":
     # Use a different port if 5000 is already in use
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8091))
 
     # Use '127.0.0.1' instead of '0.0.0.0' for local development
     host = '127.0.0.1'

@@ -28,8 +28,6 @@
         <p>Left Counter: <span id="left_counter">0</span></p>
         <p>Right Counter: <span id="right_counter">0</span></p>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/5.10.0/socket.io.js"></script>
     <script>
         var socket = io.connect("https://tryus.onrender.com");
     
@@ -37,6 +35,7 @@
         // Handle Socket.IO connection event
         socket.on('connect', function () {
             console.log('Connected!', socket.connected);
+            console.log(sl);
         });
 
         const video = document.querySelector('#videoElement');
